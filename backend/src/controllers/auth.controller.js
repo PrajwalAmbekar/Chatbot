@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../lib/utils.js";
+import cloudinary from "../lib/cloudinary.js";
+
 
 
 
@@ -79,11 +81,30 @@ export const login =async (req, res) => {
 
 export const logout = (req, res) => {
     try {
-        res.cookies("jwt","",{masAge:0});
+        res.cookies("jwt","",{maxAge:0});
         res.status(200).json("Logged out successfully");
         
     } catch (error) {
-        console.llog("Error in logout controller");
+        console.log("Error in logout controller");
         res.status(500).json("Internal Server Error");
     }
+}
+export const updateProfile=async (req,res)=>{
+    try {
+        const {profilePic} =req.body;
+        const userId=req.user._id;
+        if(!profilePic){
+            res.status(401).json("Profile pic is not provided");
+        }
+        const uploadResponse=await cloudinary.uploader.upload(profilePic);
+        const updateUser= await User.findByIdAndUpdate(userId,{profilePic:uploadResponse.secure_url},{new:true});
+        res.status(200).json("Profile pic is updated successfully");
+    } catch (error) {
+        console.log("Error in updating profile pic");
+        res.status(500).json("Internal Server error");
+        
+    }
+   
+
+
 }
