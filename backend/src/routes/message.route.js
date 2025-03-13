@@ -7,5 +7,6 @@ const routes=express.Router();
 
 routes.get("/users", protectRoute ,getUserForSideBar);
 routes.get("/:id",protectRoute,getMessage);
+routes.post("/send/:id",protectRoute,sendMessa)
 
 export default routes;
